@@ -199,6 +199,28 @@ This action:
 3. Posts/updates a PR comment with the command
 4. Allows users to test the exact PR changes
 
+## Development
+
+This action uses [@vercel/ncc](https://github.com/vercel/ncc) to bundle dependencies into a single file.
+
+### Building
+
+After making changes to `src/index.js`, run:
+
+```bash
+npm run build
+```
+
+This compiles `src/index.js` and all dependencies into `dist/index.js`. The `dist/` folder is committed to the repository (not `node_modules/`).
+
+### Why Bundle?
+
+- **No runtime dependencies** - `dist/index.js` contains everything
+- **Faster action execution** - no `npm install` needed
+- **Smaller repository** - commit bundled code, not `node_modules/`
+
+This follows the same pattern as official GitHub actions like [actions/labeler](https://github.com/actions/labeler).
+
 ## License
 
 MIT
