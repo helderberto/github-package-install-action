@@ -1,4 +1,4 @@
-name: 'GitHub Package Install'
+name: 'GitHub Package Install by Helder Berto'
 description: 'Post npm install command for testing packages directly from GitHub commits'
 author: 'Helder Burato Berto'
 
