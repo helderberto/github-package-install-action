@@ -31683,6 +31683,35 @@ module.exports = parseParams
 /******/ }
 /******/ 
 /************************************************************************/
+/******/ /* webpack/runtime/compat get default export */
+/******/ (() => {
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__nccwpck_require__.n = (module) => {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			() => (module['default']) :
+/******/ 			() => (module);
+/******/ 		__nccwpck_require__.d(getter, { a: getter });
+/******/ 		return getter;
+/******/ 	};
+/******/ })();
+/******/ 
+/******/ /* webpack/runtime/define property getters */
+/******/ (() => {
+/******/ 	// define getter functions for harmony exports
+/******/ 	__nccwpck_require__.d = (exports, definition) => {
+/******/ 		for(var key in definition) {
+/******/ 			if(__nccwpck_require__.o(definition, key) && !__nccwpck_require__.o(exports, key)) {
+/******/ 				Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 			}
+/******/ 		}
+/******/ 	};
+/******/ })();
+/******/ 
+/******/ /* webpack/runtime/hasOwnProperty shorthand */
+/******/ (() => {
+/******/ 	__nccwpck_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ })();
+/******/ 
 /******/ /* webpack/runtime/compat */
 /******/ 
 /******/ if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = new URL('.', import.meta.url).pathname.slice(import.meta.url.match(/^file:\/\/\/\w:/) ? 1 : 0, -1) + "/";
@@ -31690,34 +31719,34 @@ module.exports = parseParams
 /************************************************************************/
 var __webpack_exports__ = {};
 /* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(7484);
+/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(3228);
-
+/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__nccwpck_require__.n(_actions_github__WEBPACK_IMPORTED_MODULE_1__);
 
 
 async function run() {
-  try {
-    const token = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('github-token', { required: true });
-    const packageName = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('package-name');
-    const commentTitle = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('comment-title');
-
-    const octokit = _actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit(token);
-    const context = _actions_github__WEBPACK_IMPORTED_MODULE_1__.context;
-
-    if (context.eventName !== 'pull_request') {
-      _actions_core__WEBPACK_IMPORTED_MODULE_0__.info('This action only runs on pull_request events');
-      return;
-    }
-
-    const commitHash = context.payload.pull_request.head.sha.substring(0, 7);
-    const owner = context.repo.owner;
-    const repo = context.repo.repo;
-    const installCommand = `npm install github:${owner}/${repo}#${commitHash}`;
-
-    const packageInfo = packageName
-      ? `\n\nPackage: \`${packageName}\``
-      : '';
-
-    const comment = `## ${commentTitle}
+    try {
+        const token = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('github-token', { required: true });
+        const packageName = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('package-name');
+        const commentTitle = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('comment-title');
+        const octokit = _actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit(token);
+        const context = _actions_github__WEBPACK_IMPORTED_MODULE_1__.context;
+        if (context.eventName !== 'pull_request') {
+            _actions_core__WEBPACK_IMPORTED_MODULE_0__.info('This action only runs on pull_request events');
+            return;
+        }
+        if (!context.payload.pull_request) {
+            _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed('No pull request found in context');
+            return;
+        }
+        const commitHash = context.payload.pull_request.head.sha.substring(0, 7);
+        const owner = context.repo.owner;
+        const repo = context.repo.repo;
+        const installCommand = `npm install github:${owner}/${repo}#${commitHash}`;
+        const packageInfo = packageName
+            ? `\n\nPackage: \`${packageName}\``
+            : '';
+        const comment = `## ${commentTitle}
 
 Install this PR directly from GitHub to test it before merging:
 
@@ -31726,40 +31755,40 @@ ${installCommand}
 \`\`\`
 
 Commit: \`${commitHash}\`${packageInfo}`;
-
-    const { data: comments } = await octokit.rest.issues.listComments({
-      owner: context.repo.owner,
-      repo: context.repo.repo,
-      issue_number: context.payload.pull_request.number,
-    });
-
-    const botComment = comments.find(
-      (comment) =>
-        comment.user.type === 'Bot' &&
-        comment.body.includes(commentTitle)
-    );
-
-    if (botComment) {
-      await octokit.rest.issues.updateComment({
-        owner: context.repo.owner,
-        repo: context.repo.repo,
-        comment_id: botComment.id,
-        body: comment,
-      });
-      _actions_core__WEBPACK_IMPORTED_MODULE_0__.info('Updated existing install comment');
-    } else {
-      await octokit.rest.issues.createComment({
-        owner: context.repo.owner,
-        repo: context.repo.repo,
-        issue_number: context.payload.pull_request.number,
-        body: comment,
-      });
-      _actions_core__WEBPACK_IMPORTED_MODULE_0__.info('Created new install comment');
+        const { data: comments } = await octokit.rest.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.payload.pull_request.number,
+        });
+        const botComment = comments.find((comment) => comment.user?.type === 'Bot' &&
+            comment.body?.includes(commentTitle));
+        if (botComment) {
+            await octokit.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: comment,
+            });
+            _actions_core__WEBPACK_IMPORTED_MODULE_0__.info('Updated existing install comment');
+        }
+        else {
+            await octokit.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                body: comment,
+            });
+            _actions_core__WEBPACK_IMPORTED_MODULE_0__.info('Created new install comment');
+        }
     }
-  } catch (error) {
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(error.message);
-  }
+    catch (error) {
+        if (error instanceof Error) {
+            _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(error.message);
+        }
+        else {
+            _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed('An unknown error occurred');
+        }
+    }
 }
-
 run();
 

@@ -1,7 +1,7 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 
-async function run() {
+async function run(): Promise<void> {
   try {
     const token = core.getInput('github-token', { required: true });
     const packageName = core.getInput('package-name');
@@ -12,6 +12,11 @@ async function run() {
 
     if (context.eventName !== 'pull_request') {
       core.info('This action only runs on pull_request events');
+      return;
+    }
+
+    if (!context.payload.pull_request) {
+      core.setFailed('No pull request found in context');
       return;
     }
 
@@ -42,8 +47,8 @@ Commit: \`${commitHash}\`${packageInfo}`;
 
     const botComment = comments.find(
       (comment) =>
-        comment.user.type === 'Bot' &&
-        comment.body.includes(commentTitle)
+        comment.user?.type === 'Bot' &&
+        comment.body?.includes(commentTitle)
     );
 
     if (botComment) {
@@ -64,7 +69,11 @@ Commit: \`${commitHash}\`${packageInfo}`;
       core.info('Created new install comment');
     }
   } catch (error) {
-    core.setFailed(error.message);
+    if (error instanceof Error) {
+      core.setFailed(error.message);
+    } else {
+      core.setFailed('An unknown error occurred');
+    }
   }
 }
 
