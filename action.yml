@@ -1,0 +1,24 @@
+name: 'GitHub Package Install'
+description: 'Post npm install command for testing packages directly from GitHub commits'
+author: 'Helder Burato Berto'
+
+branding:
+  icon: 'package'
+  color: 'blue'
+
+inputs:
+  github-token:
+    description: 'GitHub token for authentication'
+    required: true
+  package-name:
+    description: 'Name of the package (optional, for display purposes)'
+    required: false
+    default: ''
+  comment-title:
+    description: 'Title for the PR comment'
+    required: false
+    default: '🎯 Test this PR'
+
+runs:
+  using: 'node20'
+  main: 'src/index.js'
